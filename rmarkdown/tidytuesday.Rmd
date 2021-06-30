@@ -57,6 +57,7 @@ animal_rescues[ sample.int(10),] |>
 ```{r geospatial}
 library(sf)
 library(convert)
+library(ggmap)
 
 #About half of cases do not have spatial coordinates and they have been removed 
 spatial <- animal_rescues |> 
@@ -67,9 +68,30 @@ spatial <- animal_rescues |>
   filter(latitude >10)
 
 
+#Setting the basemap
+london_basemap <- get_map(location= "London", zoom=10, extent = "device", legend = "topleft")
 
-ggplot() +
-  geom_point(data = spatial, aes(x = latitude, y = longitude)) 
+
+ggmap(london_basemap) +
+  geom_point(data = spatial, aes(y = latitude, x = longitude, color = special_service_type_category), inherit.aes = FALSE) 
+
+
+ggmap(london_basemap) +
+  stat_density2d(
+    aes(
+      x = longitude,
+      y = latitude,
+      fill = ..level..,
+      alpha = ..level..
+    ),
+    size = 2,
+    bins = 4,
+    data = spatial,
+    geom = "polygon"
+  )
+
+
+
 
 
 
